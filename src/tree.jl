@@ -1,4 +1,4 @@
-struct POMCPOWTree{B,A,O,RB}
+struct LBPWTree{B,A,O,RB}
     # action nodes
     n::Vector{Int}
     v::Vector{Float64}
@@ -17,7 +17,7 @@ struct POMCPOWTree{B,A,O,RB}
     # root
     root_belief::RB
 
-    function POMCPOWTree{B,A,O,RB}(root_belief, sz::Int=1000) where{B,A,O,RB}
+    function LBPWTree{B,A,O,RB}(root_belief, sz::Int=1000) where{B,A,O,RB}
         sz = min(sz, 100_000)
         return new(
             sizehint!(Int[], sz),
@@ -38,7 +38,7 @@ struct POMCPOWTree{B,A,O,RB}
     end
 end
 
-@inline function push_anode!(tree::POMCPOWTree{B,A,O}, h::Int, a::A, n::Int=0, v::Float64=0.0, update_lookup=true) where {B,A,O}
+@inline function push_anode!(tree::LBPWTree{B,A,O}, h::Int, a::A, n::Int=0, v::Float64=0.0, update_lookup=true) where {B,A,O}
     anode = length(tree.n) + 1
     push!(tree.n, n)
     push!(tree.v, v)
@@ -53,24 +53,24 @@ end
     return anode
 end
 
-struct POWTreeObsNode{B,A,O,RB} <: BeliefNode
-    tree::POMCPOWTree{B,A,O,RB}
+struct LBPWTreeObsNode{B,A,O,RB} <: BeliefNode
+    tree::LBPWTree{B,A,O,RB}
     node::Int
 end
 
-isroot(h::POWTreeObsNode) = h.node==1
-@inline function belief(h::POWTreeObsNode)
+isroot(h::LBPWTreeObsNode) = h.node==1
+@inline function belief(h::LBPWTreeObsNode)
     if isroot(h)
         return h.tree.root_belief
     else
         return StateBelief(h.tree.sr_beliefs[h.node])
     end
 end
-function sr_belief(h::POWTreeObsNode)
+function sr_belief(h::LBPWTreeObsNode)
     if isroot(h)
-        error("Tried to access the sr_belief for the root node in a POMCPOW tree")
+        error("Tried to access the sr_belief for the root node in a LBPW tree")
     else
         return h.tree.sr_beliefs[h.node]
     end
 end
-n_children(h::POWTreeObsNode) = length(h.tree.tried[h.node])
+n_children(h::LBPWTreeObsNode) = length(h.tree.tried[h.node])

@@ -1,6 +1,6 @@
-function D3Trees.D3Tree(p::POMCPOWPlanner; title="POMCPOW Tree", kwargs...)
+function D3Trees.D3Tree(p::LBPWPlanner; title="LBPW Tree", kwargs...)
     @warn("""
-         D3Tree(planner::POMCPOWPlanner) is deprecated and may be removed in the future. Instead, please use
+         D3Tree(planner::LBPWPlanner) is deprecated and may be removed in the future. Instead, please use
 
              a, info = action_info(planner, state)
              D3Tree(info[:tree])
@@ -12,12 +12,12 @@ function D3Trees.D3Tree(p::POMCPOWPlanner; title="POMCPOW Tree", kwargs...)
          """)
 
     if p.tree == nothing
-        error("POMCPOWPlanner has not constructed a tree yet, run `action(planner, belief)` first to construct the tree.")
+        error("LBPWPlanner has not constructed a tree yet, run `action(planner, belief)` first to construct the tree.")
     end
     return D3Tree(p.tree; title=title, kwargs...)
 end
 
-function D3Trees.D3Tree(t::POMCPOWTree; title="POMCPOW Tree", kwargs...)
+function D3Trees.D3Tree(t::LBPWTree; title="LBPW Tree", kwargs...)
     lenb = length(t.total_n)
     lenba = length(t.n)
     len = lenb + lenba
@@ -78,5 +78,5 @@ function D3Trees.D3Tree(t::POMCPOWTree; title="POMCPOW Tree", kwargs...)
 
 end
 
-Base.show(io::IO, mime::MIME"text/html", t::POMCPOWTree) = show(io, mime, D3Tree(t))
-Base.show(io::IO, mime::MIME"text/plain", t::POMCPOWTree) = show(io, mime, D3Tree(t))
+Base.show(io::IO, mime::MIME"text/html", t::LBPWTree) = show(io, mime, D3Tree(t))
+Base.show(io::IO, mime::MIME"text/plain", t::LBPWTree) = show(io, mime, D3Tree(t))

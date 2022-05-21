@@ -1,6 +1,6 @@
 # this generated the error
 #
-# ERROR: LoadError: MethodError: no method matching init_node_sr_belief(::POMCPOW.POWNodeFilter, ::SimplePOMDP, ::Int64, ::Int64, ::Int64, ::Float64, ::Int64)
+# ERROR: LoadError: MethodError: no method matching init_node_sr_belief(::LBPW.LBPWNodeFilter, ::SimplePOMDP, ::Int64, ::Int64, ::Int64, ::Float64, ::Int64)
 
 struct SimplePOMDP <: POMDP{Int,Int,Float64}
     p_success::Float64
@@ -40,7 +40,7 @@ pomdp = SimplePOMDP(0.7)
 
 s = 5
 b = SparseCat([s], [1.0])
-solver = POMCPOWSolver()
+solver = LBPWSolver()
 
 planner = solve(solver, pomdp)
 a, info = action_info(planner, b)

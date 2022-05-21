@@ -1,4 +1,4 @@
-using POMCPOW
+using LBPW
 using Test
 
 using POMDPs
@@ -13,27 +13,27 @@ using POMDPPolicies
 @testset "all" begin
 
     @testset "POMDPTesting" begin
-        solver = POMCPOWSolver()
+        solver = LBPWSolver()
         pomdp = BabyPOMDP()
         test_solver(solver, pomdp, updater=DiscreteUpdater(pomdp))
         test_solver(solver, pomdp)
 
-        solver = POMCPOWSolver(max_time=0.1, tree_queries=typemax(Int))
+        solver = LBPWSolver(max_time=0.1, tree_queries=typemax(Int))
         test_solver(solver, pomdp, updater=DiscreteUpdater(pomdp))
     end
 
     @testset "type stability" begin
         # make sure internal function is type stable
         pomdp = BabyPOMDP()
-        solver = POMCPOWSolver()
+        solver = LBPWSolver()
         planner = solve(solver, pomdp)
         b = initialstate_distribution(pomdp)
-        B = POMCPOW.belief_type(POMCPOW.POWNodeFilter, typeof(pomdp))
-        tree = POMCPOWTree{B,Bool,Bool,typeof(b)}(b, 2*planner.solver.tree_queries)
-        @inferred POMCPOW.simulate(planner, POMCPOW.POWTreeObsNode(tree, 1), true, 10)
+        B = LBPW.belief_type(LBPW.LBPWNodeFilter, typeof(pomdp))
+        tree = LBPWTree{B,Bool,Bool,typeof(b)}(b, 2*planner.solver.tree_queries)
+        @inferred LBPW.simulate(planner, LBPW.LBPWTreeObsNode(tree, 1), true, 10)
 
         pomdp = LightDark1D()
-        solver = POMCPOWSolver(default_action=485)
+        solver = LBPWSolver(default_action=485)
         planner = solve(solver, pomdp)
 
         b = ParticleCollection([LightDark1DState(-1, 0)])
@@ -45,19 +45,19 @@ using POMDPPolicies
 
     @testset "currentobs and history" begin
         pomdp = BabyPOMDP()
-        solver = POMCPOWSolver()
+        solver = LBPWSolver()
         planner = solve(solver, pomdp)
         b = initialstate_distribution(pomdp)
-        B = POMCPOW.belief_type(POMCPOW.POWNodeFilter, typeof(pomdp))
-        tree = POMCPOWTree{B,Bool,Bool,typeof(b)}(b, 2*planner.solver.tree_queries)
+        B = LBPW.belief_type(LBPW.LBPWNodeFilter, typeof(pomdp))
+        tree = LBPWTree{B,Bool,Bool,typeof(b)}(b, 2*planner.solver.tree_queries)
 
-        n = POMCPOW.POWTreeObsNode(tree, 1)
+        n = LBPW.LBPWTreeObsNode(tree, 1)
         nb = belief(n)
         # we can't call current obs on the root node
         @test_throws MethodError currentobs(nb)
         # simulate the tree to expand one step
-        POMCPOW.simulate(planner, n, true, 1)
-        n = POMCPOW.POWTreeObsNode(tree, 2)
+        LBPW.simulate(planner, n, true, 1)
+        n = LBPW.LBPWTreeObsNode(tree, 2)
         nb = belief(n)
         # but at a non-root node, this should work
         @test currentobs(nb) isa Bool
@@ -68,7 +68,7 @@ using POMDPPolicies
     @testset "D3tree" begin
         # make sure internal function is type stable
         pomdp = BabyPOMDP()
-        solver = POMCPOWSolver()
+        solver = LBPWSolver()
         planner = solve(solver, pomdp)
         b = initialstate_distribution(pomdp)
         a, info = action_info(planner, b)
@@ -83,7 +83,7 @@ using POMDPPolicies
 
     @testset "actionvalues" begin
         pomdp = BabyPOMDP()
-        solver = POMCPOWSolver()
+        solver = LBPWSolver()
         planner = solve(solver, pomdp)
         b = initialstate_distribution(pomdp)
         @test actionvalues(planner, b) isa AbstractVector

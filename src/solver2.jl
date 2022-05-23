@@ -3,20 +3,15 @@ function simulate(pomcp::LBPWPlanner, h_node::LBPWTreeObsNode{B,A,O}, s::S, d) w
     h = h_node.node
     sol = pomcp.solver
     dep = 1.0
-    # if POMDPs.isterminal(pomcp.problem, s)
-    #     return 0.0, dep
-    # end
-    # if d <= 0
-    #     return 0.0, dep
-    # end
+    max_depth = min(pomcp.solver.max_depth, ceil(Int, log(pomcp.solver.eps)/log(discount(pomcp.problem))))
     if POMDPs.isterminal(pomcp.problem, s) || d <= 0
         return 0.0, dep
     end
 
     if sol.enable_action_pw
         total_n = tree.total_n[h]
-        if length(tree.tried[h]) <= sol.k_action * total_n ^ sol.alpha_action
-        # if length(tree.tried[h]) < 1
+        # if length(tree.tried[h]) <= sol.k_action * total_n ^ sol.alpha_action
+        if length(tree.tried[h]) <= 4 * sqrt(total_n) / (max_depth + 1 - d)
             if h == 1
                 a = next_action(pomcp.next_action, pomcp.problem, tree.root_belief, LBPWTreeObsNode(tree, h))
             else
@@ -51,8 +46,8 @@ function simulate(pomcp::LBPWPlanner, h_node::LBPWTreeObsNode{B,A,O}, s::S, d) w
     a = tree.a_labels[best_node]
 
     new_node = false
-    if tree.n_a_children[best_node] <= sol.k_observation*(tree.n[best_node]^sol.alpha_observation)
-    # if tree.n_a_children[best_node] < 1
+    # if tree.n_a_children[best_node] <= sol.k_observation*(tree.n[best_node]^sol.alpha_observation)
+    if tree.n_a_children[best_node] <= 4 * sqrt(tree.n[best_node]) / (max_depth + 1 - d)
 
         sp, o, r = @gen(:sp, :o, :r)(pomcp.problem, s, a, sol.rng)
 

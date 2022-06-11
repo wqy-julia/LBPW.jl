@@ -46,9 +46,9 @@ function simulate(pomcp::LBPWPlanner, h_node::LBPWTreeObsNode{B,A,O}, s::S, d) w
     a = tree.a_labels[best_node]
 
     new_node = false
+
     if tree.n_a_children[best_node] <= sol.k_observation*(tree.n[best_node]^sol.alpha_observation) / (max_depth + 1 - d)
     # if tree.n_a_children[best_node] <= 4 * sqrt(tree.n[best_node]) / (max_depth + 1 - d)
-
         sp, o, r = @gen(:sp, :o, :r)(pomcp.problem, s, a, sol.rng)
 
         if sol.check_repeat_obs && haskey(tree.a_child_lookup, (best_node,o))
